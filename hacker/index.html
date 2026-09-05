@@ -62,7 +62,7 @@ startButton.addEventListener('click', () => {
 	startButton.value = 0;
 	var n = 0;
 	const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-	const bufferSize = 4096;
+	const bufferSize = 256;
 	const scriptNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
 
 	let phase = 0;
@@ -77,8 +77,8 @@ startButton.addEventListener('click', () => {
 		const sampleRate = audioCtx.sampleRate;
 		//alert(n);
 		for (let i = 0; i < bufferSize; i++) {
-			var a = calc(trin(n)*n);
-			outputData[i] = Math.sin(a[0]);
+			var a = calc(trin(n));
+			outputData[i] = a[0];
 			n ++;
 		}
 		startButton.value = n;
