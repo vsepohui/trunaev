@@ -1,0 +1,93 @@
+<html>
+<body>
+	<input type="button" id="start" value="Start a sound!"/>
+<script>
+
+const startButton = document.getElementById('start');
+
+function angle(deg) {
+	return 3.1415 * deg / 180.0;
+}
+
+function calc (anglex) {
+	while (anglex >= 360) {
+		anglex -= 360;
+	}
+	
+	while (anglex < 0) {
+		anglex += 360;
+	}
+	
+	var x0, y0;
+	if (anglex > 270) {
+		x0 = -1 * Math.cos(angle(anglex - 270));
+		y0 = Math.sin(angle(anglex - 270));
+	} else if (angle > 180) {
+		x0 = -1 * Math.sin(angle(anglex - 180));
+		y0 = -1 * Math.cos(angle(anglex - 180));
+	} else if (anglex > 90) {
+		x0 = Math.cos(angle(anglex - 90));
+		y0 = -1 * Math.sin(angle(anglex - 90));
+	} else {
+		x0 = Math.sin(angle(anglex));
+		y0 = Math.cos(angle(anglex));		
+	}
+	
+	return [x0, y0];
+}
+
+function trin (offset) {
+	var x, y;
+	
+	var step = offset;
+	x = offset - step;
+	
+	var s = step % 4;
+	
+	if (s == 0) {
+		y = 1 - x;
+	} else if (s == 3) {
+		y = step - x;
+	} else if (s == 1) {
+		y = step - x - 1;
+	} else {
+		y = -1*x;
+	}
+	
+	return y;
+}
+
+
+startButton.addEventListener('click', () => {
+	startButton.value = 0;
+	var n = 0;
+	const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+	const bufferSize = 4096;
+	const scriptNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+
+	let phase = 0;
+	
+	
+	scriptNode.onaudioprocess = function(audioProcessingEvent) {
+		n = startButton.value;
+		const outputBuffer = audioProcessingEvent.outputBuffer;
+		const outputData = outputBuffer.getChannelData(0);
+
+		const frequency = 440; 
+		const sampleRate = audioCtx.sampleRate;
+		//alert(n);
+		for (let i = 0; i < bufferSize; i++) {
+			var a = calc(trin(n)*n);
+			outputData[i] = Math.sin(a[0]);
+			n ++;
+		}
+		startButton.value = n;
+};
+
+// 4. Connect the node to the speakers (destination) to start playback
+scriptNode.connect(audioCtx.destination);
+
+});
+</script>
+</body>
+</html>
